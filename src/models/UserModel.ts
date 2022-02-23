@@ -4,13 +4,13 @@ import Users from "../types/UserTypes";
 const {ObjectId} = Types;
 
 const usersSchema = new Schema<Users>({
-    _id:{
-        type:String
-    },
     name:{
         type:String
     },
     email:{
+        type:String
+    },
+    password:{
         type:String
     }
 })

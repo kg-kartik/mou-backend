@@ -4,9 +4,12 @@ import jwt from "jsonwebtoken";
 import UserTypes from "../types/UserTypes";
 import ApiResponse from "../types/ApiResponse";
 import bcrypt from "bcrypt";
+import ErrorResponse from "../utils/ErrorResponse";
 
 require("dotenv").config();
+
 const secret = process.env.JWT_SECRET;
+const secret_password = process.env.SECRET_PASSWORD;
 
 export const signin = async (req:Request,res:Response,next:NextFunction) => {
     const { email, password } = req.body;
@@ -16,7 +19,7 @@ export const signin = async (req:Request,res:Response,next:NextFunction) => {
     const user = await Users.findOne({ email });
 
     if (!user) {
-        return next(new Error("User is not registered"));
+        return next(new ErrorResponse("User is not registered",400));
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -42,27 +45,35 @@ export const signin = async (req:Request,res:Response,next:NextFunction) => {
         res.status(200).json(response);
 
     } else {
-        next(new Error("Sorry, Incorrect Email/Password"));
+        next(new ErrorResponse("Sorry, Incorrect Email/Password",400));
     }
 }
 
 export const signup = async (req:Request,res:Response,next:NextFunction) => {
-    const { name, email, password} = req.body;
 
     //Checking if the user is already registered
-    const user = await Users.findOne({ email });
+    const user = await Users.findOne({email:req.body.email });
 
     if (user) {
         next(new Error("User with that email already exists"));
     }
 
+
     //If not , then save the student
-    const hashedPass = await bcrypt.hash(password, 10);
+    const hashedPass = await bcrypt.hash(req.body.password, 10);
+
+    if(req.body.userType === "Admin") {
+        if("lol" === req.body.secretPassword) {
+            console.log(true);
+        }
+        else{
+            return next(new ErrorResponse("Sorry,Incorrext Password",400));
+        }
+    }
 
     const newUser = new Users({
-        name,
-        email,
-        password: hashedPass,
+        ...req.body,
+        password:hashedPass
     });
 
     const savedUser = await newUser.save();

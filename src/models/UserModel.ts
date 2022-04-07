@@ -12,7 +12,14 @@ const usersSchema = new Schema<Users>({
     },
     password:{
         type:String
-    }
+    },
+    userType:{
+        type:String,
+    },
+    mou:[{
+        type:ObjectId,
+        ref:"MouAssigneeModel"
+    }]
 })
 
 const UsersModel = model<Users>("UsersModel",usersSchema);

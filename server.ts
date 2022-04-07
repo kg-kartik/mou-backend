@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import mongoose, { ConnectOptions } from "mongoose";
 import {ErrorHandler} from "./src/middlewares/errorHandler";
 import authControllers from "./src/routes/authRoutes";
+import mouRoutes from "./src/routes/mouRoutes";
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -28,6 +29,7 @@ mongoose
   });
 
 app.use("/auth",authControllers);
+app.use("/mou",mouRoutes);
 
 const PORTNUMBER: number = parseInt(process.env.PORT) || 5000;
 

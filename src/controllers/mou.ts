@@ -102,3 +102,31 @@ export const updateStatus = (req:RequestWithUser,res:Response,next:NextFunction)
         }
     }).catch(next);
 }
+
+export const getAllMous = (req:RequestWithUser,res:Response,next:NextFunction) => {
+
+    console.log(req.user._id);
+
+    UsersModel.findById({
+        _id:req.user._id
+    }).then((user) => {
+        console.log(user.userType);
+        if(user.userType === "Admin") {
+            MouAssigneeModel.find({})
+            .populate("user",["name"])
+            .then((mous) => {
+                const response:ApiResponse = {
+                    success:true,
+                    status:200,
+                    data:mous,
+                    message:"All Mous fetched successfully"
+                }
+
+                res.status(200).json(response);
+            }).catch(next);      
+        }
+        else {
+            return next(new ErrorResponse("Dont have proper rights",400));
+        }
+    })
+}

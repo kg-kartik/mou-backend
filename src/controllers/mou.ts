@@ -105,7 +105,7 @@ export const updateStatus = (req:RequestWithUser,res:Response,next:NextFunction)
 
 export const getAllMous = (req:RequestWithUser,res:Response,next:NextFunction) => {
 
-    console.log(req.user._id);
+    console.log(req.user,"user");
 
     UsersModel.findById({
         _id:req.user._id
@@ -130,3 +130,25 @@ export const getAllMous = (req:RequestWithUser,res:Response,next:NextFunction) =
         }
     })
 }
+
+export const getUserMous = (req:RequestWithUser,res:Response,next:NextFunction) => {
+
+
+    UsersModel.findById({
+        _id:req.user._id
+    }).populate("mou")
+    .then((user) => {
+        
+
+        const response:ApiResponse = {
+            success:true,
+            status:200,
+            data:user.mou,
+            message:"All Mous fetched successfully"
+        }
+
+        res.status(200).json(response);
+
+    }).catch(next);      
+}
+

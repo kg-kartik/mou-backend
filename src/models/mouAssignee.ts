@@ -17,6 +17,12 @@ const mouAssigneeSchema = new Schema<MouAssignee>({
         type:ObjectId,
         ref:"UsersModel"
     },
+    question:{
+        type:String
+    },
+    answer:{
+        type:String
+    },
     status:{
         type:String,
         default:"Pending"

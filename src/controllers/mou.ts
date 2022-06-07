@@ -34,33 +34,34 @@ export const addMou = async (req:RequestWithUser,res:Response,next:NextFunction)
             message:"Request for mou sent successfully"
         }
     
+        
+            const SENDGRID_API_KEY ="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"
+            
+            sendgrid.setApiKey(SENDGRID_API_KEY);
+            
+            const msg = {
+                to: "goel.kartik39@gmail.com",
+                from: "cryptxmuj@gmail.com",
+                // Change to your recipient
+                // Change to your verified sender
+                subject: "lolll",
+                html: "thank you",
+                text:"hello"
+            }
+            
+            sendgrid
+                .send(msg)
+                .then((resp) => {
+                    console.log('Email sent\n', resp)
+                })
+                .catch((error) => {
+                    console.error(error)
+            })
+            
         res.status(200).json(response);
         
     })
 
-
-    const SENDGRID_API_KEY ="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"
-    
-    sendgrid.setApiKey(SENDGRID_API_KEY);
-    
-    const msg = {
-        to: "goel.kartik39@gmail.com",
-        from: "cryptxmuj@gmail.com",
-        // Change to your recipient
-        // Change to your verified sender
-        subject: "lolll",
-        html: "thank you",
-        text:"hello"
-    }
-    
-    sendgrid
-        .send(msg)
-        .then((resp) => {
-            console.log('Email sent\n', resp)
-        })
-        .catch((error) => {
-            console.error(error)
-    })
 
 
 }
@@ -152,3 +153,91 @@ export const getUserMous = (req:RequestWithUser,res:Response,next:NextFunction) 
     }).catch(next);      
 }
 
+export const addAnswer = (req:RequestWithUser,res:Response,next:NextFunction) => {
+    const {mouId,answer} = req.body;
+
+    UsersModel.findById({
+        _id:req.user._id
+    }).then((user) => {
+
+            MouAssigneeModel.findOneAndUpdate({
+                _id:mouId
+            },{
+                $set:{
+                    answer
+                }
+            },{
+                new:true,
+                runValidators:true/*  */
+            }).populate("user")
+            .then((mou) => {
+                const response:ApiResponse = {
+                    success:true,
+                    status:200,
+                    data:mou,
+                    message:"MOU status updated successfully"
+                }
+            
+                res.status(200).json(response);
+                       
+            }).catch(next);
+        
+    }).catch(next);
+}
+
+
+export const addQuestion = (req:RequestWithUser,res:Response,next:NextFunction) => {
+    const {mouId,question} = req.body;
+
+    UsersModel.findById({
+        _id:req.user._id
+    }).then((user) => {
+        if(user.userType === "Admin"){
+
+            MouAssigneeModel.findOneAndUpdate({
+                _id:mouId
+            },{
+                $set:{
+                    question
+                }
+            },{
+                new:true,
+                runValidators:true
+            }).populate("user")
+            .then((mou) => {
+                const response:ApiResponse = {
+                    success:true,
+                    status:200,
+                    data:mou,
+                    message:"MOU status updated successfully"
+                }
+            
+                res.status(200).json(response);
+                       
+            }).catch(next);
+        }
+        else{
+            return next(new ErrorResponse("Dont have proper rights",400));
+        }
+    }).catch(next);
+}
+
+
+export const getMouById = (req:Request,res:Response,next:NextFunction) => {
+    
+    const {_id} = req.body;
+
+    MouAssigneeModel.findById({
+        _id
+    }).then((mou) => {
+        const response:ApiResponse = {
+            success:true,
+            status:200,
+            data:mou,
+            message:"Mou fetched user"
+        }
+    
+        res.status(200).json(response);
+
+    }).catch(next);
+}

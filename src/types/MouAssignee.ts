@@ -6,6 +6,8 @@ interface MouAssignee {
     pdf:string;
     user:User;
     status:string;
+    question:string;
+    answer:string;
 }
 
 export default MouAssignee;
